@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confetti HD</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: black;
+  }
+  canvas {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<script>
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+
+let W = canvas.width = window.innerWidth;
+let H = canvas.height = window.innerHeight;
+
+window.addEventListener('resize', () => {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+});
+
+// إنشاء الكونفيتي
+class Confetti {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = H + Math.random() * 100;
+    this.size = Math.random() * 8 + 4;
+    this.speedY = Math.random() * 2 + 1;
+    this.speedX = Math.random() * 2 - 1;
+    this.color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+    this.opacity = Math.random() * 0.5 + 0.5;
+  }
+  update() {
+    this.y -= this.speedY;
+    this.x += this.speedX;
+    if (this.y < -this.size) this.reset();
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.opacity;
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// إنشاء نصوص عشوائية
+class BeautyText {
+  constructor() {
+    this.texts = ["🎉", "✨", "🌟", "💫", "🔥"];
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = H + Math.random() * 50;
+    this.speedY = Math.random() * 1 + 0.5;
+    this.size = Math.random() * 24 + 16;
+    this.color = `hsl(${Math.random() * 360}, 100%, 80%)`;
+    this.text = this.texts[Math.floor(Math.random() * this.texts.length)];
+    this.opacity = 1;
+  }
+  update() {
+    this.y -= this.speedY;
+    this.opacity -= 0.005;
+    if (this.y < -50 || this.opacity <= 0) this.reset();
+  }
+  draw() {
+    ctx.font = `${this.size}px Arial`;
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.opacity;
+    ctx.fillText(this.text, this.x, this.y);
+  }
+}
+
+const confettis = Array.from({length: 150}, () => new Confetti());
+const texts = Array.from({length: 10}, () => new BeautyText());
+
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.globalAlpha = 1;
+  
+  confettis.forEach(c => {
+    c.update();
+    c.draw();
+  });
+  
+  texts.forEach(t => {
+    t.update();
+    t.draw();
+  });
+  
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
